@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
+        integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w=="
+        crossorigin="anonymous" />
+    <title>Document</title>
+    <style>
+        body {
+            background: #f5f5f5;
+        }
+
+        .player {
+            max-width: 380px;
+            position: relative;
+            margin: auto;
+        }
+
+        .player .icon-pause {
+            display: none;
+        }
+
+        .player.playing .icon-pause {
+            display: inline-block;
+        }
+
+        .player.playing .icon-play {
+            display: none;
+        }
+
+        header {
+            font-size: 15px;
+            text-align: center;
+        }
+
+        .dasboard {
+            position: fixed;
+            top: 0;
+            background: #fff;
+            width: 380px;
+            margin: auto;
+            max-width: 380px;
+        }
+
+        .title {
+            display: flex;
+            justify-content: center;
+        }
+
+        .cd {
+            display: flex;
+            margin: auto;
+            width: 200px;
+        }
+
+        .img {
+            width: 100%;
+            background-size: cover !important;
+            padding-top: 100%;
+            border-radius: 50%;
+            margin: auto;
+        }
+
+        .playlists {
+            padding-top: 415px;
+            width: 380px;
+            max-width: 380px;
+            height: 100%;
+            margin: auto;
+        }
+
+        .song {
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.4);
+            border-radius: 3px;
+            height: 75px;
+            margin: auto;
+            margin-top: 15px;
+            background: #fff;
+        }
+
+        .thumb {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-size: cover !important;
+            margin-top: 12px;
+            margin-left: 17px;
+        }
+
+        .body {
+            padding: 10px 0;
+            margin-left: 10px;
+            flex: 1;
+        }
+
+        h2.title {
+            display: inline-block;
+            text-align: left;
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+
+        p.author {
+            margin: 0;
+        }
+
+        .option {
+            font-size: 18px;
+            color: rgba(137, 133, 183, 0.5);
+            padding: 20px 20px;
+            margin-top: 10px;
+        }
+
+        .control {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            height: 100px;
+            font-size: 21px;
+            color: hsl(244.8deg 25.77% 61.96%);
+
+        }
+
+        .play {
+            border: none;
+            outline: none;
+            padding: 20px;
+            border-radius: 50%;
+            display: block;
+            background: hsl(344.2deg 84.36% 52.35%);
+            color: #fff;
+        }
+
+        .progress {
+            display: block;
+            width: 100%;
+            outline: none;
+        }
+    </style>
+</head>
+
+<body>
+
+
+
+    <div class="player">
+        <div class="dasboard">
+            <header>
+                <h4>Now playing:</h4>
+                <h2>String 57th & 9th</h2>
+            </header>
+
+            <div class="cd">
+                <div class="img"
+                    style="background: url('https://img.pikbest.com/origin/09/41/85/916pIkbEsTzRC.jpg!w700wp') no-repeat;">
+                </div>
+            </div>
+
+            <div class="control">
+                <div class="repeat">
+                    <i class="fas fa-redo-alt"></i>
+                </div>
+
+                <div class="prev">
+                    <i class="fas fa-step-backward"></i>
+                </div>
+
+                <div class="play">
+                    <i class="fas fa-pause icon-pause"></i>
+                    <i class="fas fa-play icon-play"></i>
+                </div>
+
+                <div class="next">
+                    <i class="fas fa-step-forward"></i>
+                </div>
+
+                <div class="random">
+                    <i class="fas fa-random"></i>
+                </div>
+            </div>
+            <input class="progress" id="progress" type="range" value="0" step="1" min="0" max="100" />
+            <audio id="audio" src=""></audio>
+        </div>
+
+        <div class="playlists">
+            <!-- render code here -->
+        </div>
+    </div>
+
+    <script>
+        /*
+            * 1. Render songs
+            * 2. Scroll top
+            * 3. Play/ pause/ seek
+            * 4. cd rotate
+            * 5. Next / prev
+            * 6. Random
+            * 7. Next / repeat when ended
+            * 8. Active song
+            * 9. Scroll active song into view
+            * 10. Play song when click
+        */
+
+        const $ = document.querySelector.bind(document);
+        const $$ = document.querySelectorAll.bind(document);
+
+
+        const app = {
+            /* get currenIndex */
+            currentIndex: 0,
+            isPlaying: false,
+
+            /* this is song lists */
+            songs: [
+                {
+                    images: 'https://i1-vnexpress.vnecdn.net/2024/09/01/cucgach-1723717256-2969-172371-5148-6267-1725149434.jpg?w=680&h=0&q=100&dpr=1&fit=crop&s=2lfwB-ZttwaF-g20cqerkQ',
+                    name: 'BaiKhongTenCuoiCung-LeQuyen-3652831.mp3',
+                    singer: 'Lệ Quyên',
+                },
+                {
+                    images: 'https://i1-thethao.vnecdn.net/2024/09/01/a-5226-1725156556.png?w=680&h=0&q=100&dpr=1&fit=crop&s=-C4dsbEXfuYzobKfEAL_tQ',
+                    name: 'DangCay-LeQuyen_p93z.mp3',
+                    singer: 'Lệ Quyên',
+                },
+                {
+                    images: 'https://i1-vnexpress.vnecdn.net/2024/08/31/phaohoa-13-JPG-1693667007-1372-7180-7092-1725098668.jpg?w=680&h=0&q=100&dpr=1&fit=crop&s=vp0ID8XgwUKwuIrWzFL4kA',
+                    name: 'HoaNoVeDem-LeQuyen-3816892.mp3',
+                    singer: 'Lệ Quyên',
+                },
+                {
+                    images: 'https://i1-vnexpress.vnecdn.net/2024/08/30/H6-6854-1725030323.jpg?w=680&h=0&q=100&dpr=1&fit=crop&s=i0xShP8sWwP17CVQzD1BDg',
+                    name: 'MatNgot-DungHoangPham-9359370.mp3',
+                    singer: 'Lệ Quyên',
+                },
+                {
+                    images: 'https://i1-thethao.vnecdn.net/2024/09/01/AFP-20240824-36EQ3NZ-v1-Previe-6058-9623-1725156556.jpg?w=680&h=0&q=100&dpr=1&fit=crop&s=04v3Z7xLE9ng0xExjhBRAw',
+                    name: 'NgonTrucDao-LeQuyen-2449151.mp3',
+                    singer: 'Lệ Quyên',
+                },
+                {
+                    images: 'https://i1-vnexpress.vnecdn.net/2024/09/01/cucgach-1723717256-2969-172371-5148-6267-1725149434.jpg?w=680&h=0&q=100&dpr=1&fit=crop&s=2lfwB-ZttwaF-g20cqerkQ',
+                    name: 'BaiKhongTenCuoiCung-LeQuyen-3652831.mp3',
+                    singer: 'Lệ Quyên',
+                },
+                {
+                    images: 'https://i1-thethao.vnecdn.net/2024/09/01/a-5226-1725156556.png?w=680&h=0&q=100&dpr=1&fit=crop&s=-C4dsbEXfuYzobKfEAL_tQ',
+                    name: 'DangCay-LeQuyen_p93z.mp3',
+                    singer: 'Lệ Quyên',
+                },
+                {
+                    images: 'https://i1-vnexpress.vnecdn.net/2024/08/31/phaohoa-13-JPG-1693667007-1372-7180-7092-1725098668.jpg?w=680&h=0&q=100&dpr=1&fit=crop&s=vp0ID8XgwUKwuIrWzFL4kA',
+                    name: 'HoaNoVeDem-LeQuyen-3816892.mp3',
+                    singer: 'Lệ Quyên',
+                },
+                {
+                    images: 'https://i1-vnexpress.vnecdn.net/2024/08/30/H6-6854-1725030323.jpg?w=680&h=0&q=100&dpr=1&fit=crop&s=i0xShP8sWwP17CVQzD1BDg',
+                    name: 'MatNgot-DungHoangPham-9359370.mp3',
+                    singer: 'Lệ Quyên',
+                },
+                {
+                    images: 'https://i1-thethao.vnecdn.net/2024/09/01/AFP-20240824-36EQ3NZ-v1-Previe-6058-9623-1725156556.jpg?w=680&h=0&q=100&dpr=1&fit=crop&s=04v3Z7xLE9ng0xExjhBRAw',
+                    name: 'NgonTrucDao-LeQuyen-2449151.mp3',
+                    singer: 'Lệ Quyên',
+                },
+
+
+            ],
+            /* Render list song */
+            render: () => {
+
+                const htmls = app.songs.map(song => {
+                    return `
+                        <div class="song">
+                            <div class="thumb"
+                                style="background: url(${song.images});">
+
+                            </div>
+                            <div class="body">
+                                <h2 class="title">${song.name}</h2>
+                                <p class="author">${song.singer}</p>
+                            </div>
+
+                            <div class="option">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </div>
+                        </div>
+                    `
+
+                })
+
+                $('.playlists').innerHTML = htmls.join('')
+            },
+            /* define Property for Object */
+            defineProperties: function () {
+                Object.defineProperty(this, 'currentSong', {
+                    get: function () {
+                        return this.songs[this.currentIndex]
+                    }
+                })
+            },
+
+            /* Load current songs */
+            loadCurrentSong: function () {
+                const header = $('header h2');
+                const image = $('.img');
+                const audio = $('#audio');
+
+                header.textContent = this.currentSong.name
+                image.style.backgroundImage = `url('${this.currentSong.images}')`
+                audio.src = `./list/${this.currentSong.name}`
+
+            },
+
+            handleEvent: function () {
+
+                /* Start handle onscroll */
+
+                const cdWidth = $('.cd').offsetWidth;
+
+                /*  */
+
+                const cdAnimation = $('.cd').animate([
+                    { transform: 'rotate(360deg)' }
+                ], {
+                    duration: 100000,
+                    iterations: Infinity
+                })
+                cdAnimation.pause()
+                /*  */
+
+                document.onscroll = function () {
+                    const scrollTop = window.scrollY
+
+                    const newcdWidth = cdWidth - scrollTop;
+
+                    $('.cd').style.width = newcdWidth > 0 ? newcdWidth + 'px' : 0;
+                    $('.cd').style.opacity = newcdWidth / cdWidth
+                }
+                /* End handle onscroll */
+
+                /*  Start handle playing */
+                $('.play').onclick = function () {
+                    if (app.isPlaying) {
+                        $('#audio').pause()
+
+                    } else {
+                        $('#audio').play()
+                    }
+                }
+
+                $('#audio').onplay = function () {
+                    app.isPlaying = true
+                    $('.player').classList.add('playing')
+                    cdAnimation.play()
+                }
+
+                $('#audio').onpause = function () {
+                    app.isPlaying = false
+                    $('.player').classList.remove('playing')
+                    cdAnimation.pause();
+                }
+
+                /* End playing */
+
+                /*  */
+
+                $('#audio').ontimeupdate = function () {
+                    $('#progress').value = Math.floor($('#audio').currentTime / $('#audio').duration * 100)
+                }
+
+                $('#progress').onchange = function (e) {
+                    const seekTime = e.target.value / 100 * $('#audio').duration
+                    $('#audio').currentTime = seekTime
+                }
+
+                $('.next').onclick = function () {
+                    app.nextSong();
+                    $('#audio').play()
+                }
+
+            },
+
+            nextSong: () => {
+                app.currentIndex++
+                if (app.currentIndex >= app.songs.length) {
+                    this.currentIndex = 0;
+                }
+                app.loadCurrentSong()
+            },
+
+            getCurrentSong: function () {
+                return this.songs[this.currentIndex]
+            },
+
+            /* function start */
+            start: function () {
+                /* dinh nghia thuoc tinh cho Object */
+                app.defineProperties();
+                app.loadCurrentSong();
+                app.handleEvent();
+
+                app.render();
+            }
+        }
+
+        app.start();
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+
+    <link rel="stylesheet" href="style.css">
+    <title>Player</title>
+</head>
+<body>
+
+    <div class="player">
+        <div class="dasboard">
+            <div class="header">
+                <h4>Playing now</h4>
+                <h2>Nevada</h2>
+            </div>
+            <div class="cd">
+                <div class="cd-thumb" style="background: url('https://i1-vnexpress.vnecdn.net/2024/08/30/AFP-20240828-36EZ6NX-v1-HighRe-1468-1213-1725005845.jpg?w=680&h=0&q=100&dpr=1&fit=crop&s=5IZMRasPsaJeKCF7RjmVIQ') no-repeat;"></div>
+            </div>
+            <div class="controller">
+                <div class="repeat">
+                    <i class="fas fa-redo-alt"></i>
+                </div>
+                <div class="prev">
+                    <i class="fas fa-step-backward"></i>
+                </div>
+                <div class="play">
+                    <i class="fas fa-play icon-play"></i>
+                    <i class="fas fa-pause icon-pause"></i>
+                </div>
+
+                <div class="next">
+                    <i class="fas fa-step-forward"></i>
+                </div>
+                <div class="random">
+                    <i class="fas fa-random"></i>
+                </div>
+
+            </div>
+            <div class="rang">
+                <input type="range" id="progress" value="0" step="1" min="0" max="100">
+                <audio id="audio" src=""></audio>
+            </div>
+
+        </div>
+
+        <!-- Lists -->
+         <div class="playlist">
+           
+         </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
